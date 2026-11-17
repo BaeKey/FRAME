@@ -1,0 +1,28 @@
+# Local configuration and credentials
+/config.yaml
+/config.local.yaml
+.env
+.env.*
+*.pem
+*.key
+
+# Go build output and legacy local data
+/bin/
+/data/
+*.db
+*.db-shm
+*.db-wal
+
+# JavaScript dependencies and generated build/test artifacts
+/node_modules/
+/web/node_modules/
+/web/dist/
+/web/test-results/
+/web/playwright-report/
+/test-results/
+/playwright-report/
+
+# Editor / OS artifacts
+.DS_Store
+.vscode/
+.idea/

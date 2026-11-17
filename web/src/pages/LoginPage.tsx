@@ -1,0 +1,9 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useSessionStore } from '../store/session';
+export function LoginPage() {
+ const [token,setToken]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);const [visible,setVisible]=useState(false);
+ const login=useSessionStore(s=>s.login);const navigate=useNavigate();
+ const submit=async(event:React.FormEvent)=>{event.preventDefault();setBusy(true);setError('');try{await login(token);setToken('');navigate('/',{replace:true});}catch(e){setError(e instanceof Error?e.message:'登录失败');}finally{setBusy(false);}};
+ return <section className="login-layout"><div className="login-art" aria-hidden="true"><div className="art-caption">照片 / 视频</div><div className="art-frame frame-back"/><div className="art-frame frame-front"><span className="art-sun"/><span className="art-hill hill-one"/><span className="art-hill hill-two"/></div><div className="art-play">▶</div><div className="art-foot">每一帧，都有自己的位置。</div></div><div className="login-content"><span className="section-kicker">你的私人收藏</span><h1>打开你的媒体库</h1><p className="login-description">照片与视频，集中浏览。<br/>输入访问令牌，继续查看你的内容。</p><form onSubmit={submit}><label htmlFor="token">访问令牌</label><div className="password-field"><input id="token" type={visible?'text':'password'} autoComplete="current-password" required value={token} onChange={e=>setToken(e.target.value)} placeholder="输入访问令牌"/><button type="button" className="icon-button" aria-label={visible?'隐藏访问令牌':'显示访问令牌'} onClick={()=>setVisible(v=>!v)}>◉</button></div><p className="field-help">使用网关配置中的访问令牌，不是 OpenList 密码。</p><p className="inline-error" role="alert">{error}</p><button className="primary full-width" disabled={busy}>{busy?'正在登录…':'进入媒体库 →'}</button></form><p className="login-note">🔒 内容在浏览器中解密，令牌不会保存在页面中。</p></div></section>;
+}

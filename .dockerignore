@@ -1,0 +1,13 @@
+**
+!go.mod
+!go.sum
+!cmd/
+!cmd/**
+!internal/
+!internal/**
+!web/
+!web/**
+**/*_test.go
+**/*.test.js
+/web/node_modules/
+/web/dist/

@@ -1,0 +1,43 @@
+# FRAME 示例配置。复制为 config.yaml 后填写凭据；真实配置不提交 Git。
+server:
+  # 本机运行用 127.0.0.1:8080；容器运行改为 0.0.0.0:8080。
+  # 公网 HTTPS 由 Nginx 负责，网关 HTTP 端口不要直接暴露到公网。
+  listen: "127.0.0.1:8080"
+  # 至少 32 字节，建议使用 openssl rand -hex 32 生成。
+  access_token: "REPLACE_WITH_AT_LEAST_32_RANDOM_CHARACTERS"
+
+openlist:
+  base_url: "https://your-openlist.example.com"
+  # OpenList 登录凭据；FRAME 自动获取并刷新上游 token。
+  username: "REPLACE_WITH_OPENLIST_USERNAME"
+  password: "REPLACE_WITH_OPENLIST_PASSWORD"
+  # 必须指向原始密文目录，不能指向已经解密的挂载。
+  # 所有文件 raw_url 必须是支持 CORS 的网盘/CDN 直链，视频额外需 Range，不开启下载代理。
+  cipher_backend_path: "/backend/encrypted"
+
+crypt:
+  # 必须与写入 OLAES1 文件的 AESCTR 驱动保持一致。
+  password: "REPLACE_WITH_ENCRYPTION_PASSWORD"
+  salt_base64: "REPLACE_WITH_DRIVER_SALT"
+  argon2:
+    time: 3
+    memory_kib: 65536
+    threads: 4
+
+session:
+  # 浏览器内存密钥刷新周期，不是登录 Cookie 有效期。
+  key_ttl_seconds: 900
+
+index:
+  # 导航时按需检查内存索引，没有周期扫描定时器；重启后会重新从 OpenList 扫描。
+  check_interval_seconds: 600
+  # 命名规则仅从配置文件加载，修改后重启服务生效。
+  naming_rules:
+    - name: "用户与时间"
+      template: "{group}_{date}-{time}.{ext}"
+      enabled: true
+
+logging:
+  # error：仅错误；info：关键链路/完成事件；debug：逐请求、分块、缓存与解密详情。
+  # 同时控制 Go JSON 日志与浏览器控制台日志；修改后重启服务、刷新页面。
+  level: "info"
