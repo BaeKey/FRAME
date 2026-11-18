@@ -24,7 +24,8 @@ export function createApiClient(onUnauthorized: () => void): ApiClient {
     return await response.json() as T;
   }
   return {
-    login: async (token) => { await request('/api/login', { method: 'POST', credentials: 'omit', headers: { Authorization: `Bearer ${token}` } }); },
+    // Login must accept Set-Cookie; subsequent API calls authenticate with it.
+    login: async (token) => { await request('/api/login', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }); },
     logout: () => request('/api/logout', { method: 'POST' }),
     getSession: () => request('/api/session', { method: 'POST' }),
     getGroups: async () => { const data = await request<{ users: Group[]; groups?: Group[]; unrecognized: number; index: IndexStatus }>('/api/users'); return { groups: data.groups ?? data.users ?? [], unrecognized: data.unrecognized ?? 0, index: data.index }; },
