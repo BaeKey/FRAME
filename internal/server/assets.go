@@ -48,7 +48,7 @@ func (s *server) static(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Cache-Control", "no-cache")
 	if name == "sw.js" {
-		w.Header().Set("Service-Worker-Allowed", "/")
+		w.Header().Set("Service-Worker-Allowed", s.basePath+"/")
 	}
 	s.asset(w, r, name)
 }

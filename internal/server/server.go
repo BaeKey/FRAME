@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/BaeKey/FRAME/internal/catalog"
@@ -23,22 +24,24 @@ type Options struct {
 	Logger      *slog.Logger
 	LogLevel    string
 	AccessToken string
+	BasePath    string
 	KeyTTL      time.Duration
 }
 
 type server struct {
-	options Options
-	key     []byte
-	source  MediaSource
-	catalog *catalog.Catalog
-	assets  fs.FS
-	state   *state.Manager
+	options  Options
+	basePath string
+	key      []byte
+	source   MediaSource
+	catalog  *catalog.Catalog
+	assets   fs.FS
+	state    *state.Manager
 }
 
 // New builds the HTTP handler. Dependencies are initialized by the caller and
 // remain owned by the caller.
 func New(options Options, key []byte, source MediaSource, assets fs.FS, index *catalog.Catalog, runtimeState *state.Manager) http.Handler {
-	s := &server{options: options, key: append([]byte(nil), key...), source: source, catalog: index, state: runtimeState, assets: assets}
+	s := &server{options: options, basePath: options.BasePath, key: append([]byte(nil), key...), source: source, catalog: index, state: runtimeState, assets: assets}
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/delete-plan", s.batchPlan)
 	mux.HandleFunc("POST /api/delete-batch", s.batchDelete)
@@ -66,7 +69,34 @@ func New(options Options, key []byte, source MediaSource, assets fs.FS, index *c
 		}
 		s.static(w, r)
 	})
-	return s.observe(s.protect(mux), mux)
+	handler := s.observe(s.protect(mux), mux)
+	if s.basePath == "" {
+		return handler
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == s.basePath {
+			if r.Method != http.MethodGet && r.Method != http.MethodHead {
+				w.Header().Set("Allow", "GET, HEAD")
+				fail(w, http.StatusMethodNotAllowed, "方法不支持")
+				return
+			}
+			target := s.basePath + "/"
+			if r.URL.RawQuery != "" {
+				target += "?" + r.URL.RawQuery
+			}
+			http.Redirect(w, r, target, http.StatusMovedPermanently)
+			return
+		}
+		if !strings.HasPrefix(r.URL.Path, s.basePath+"/") {
+			http.NotFound(w, r)
+			return
+		}
+		r2 := r.Clone(r.Context())
+		u := *r.URL
+		u.Path = strings.TrimPrefix(r.URL.Path, s.basePath)
+		r2.URL = &u
+		handler.ServeHTTP(w, r2)
+	})
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {

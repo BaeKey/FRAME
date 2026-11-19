@@ -3,6 +3,8 @@ server:
   # 本机运行用 127.0.0.1:8080；容器运行改为 0.0.0.0:8080。
   # 公网 HTTPS 由 Nginx 负责，网关 HTTP 端口不要直接暴露到公网。
   listen: "127.0.0.1:8080"
+  # 可选挂载路径；配置后通过该路径访问，例如 /frame。
+  base_path: ""
   # 至少 32 字节，建议使用 openssl rand -hex 32 生成。
   access_token: "REPLACE_WITH_AT_LEAST_32_RANDOM_CHARACTERS"
 

@@ -39,7 +39,7 @@ npm run build --prefix web
 go run ./cmd/gateway -config config.yaml
 ```
 
-默认监听 `127.0.0.1:8080`，然后在本机浏览器打开 <http://127.0.0.1:8080>，用 `server.access_token` 登录。若希望直接在 Go 命令中运行而不是 `go run`，先构建：
+默认监听 `127.0.0.1:8080`，然后在本机浏览器打开 <http://127.0.0.1:8080>，用 `server.access_token` 登录。需要通过反向代理挂载到子路径时，将 `server.base_path` 设为规范路径（例如 `/frame`），并让代理把 `/frame/` 下的请求转发到网关；访问地址为 `https://example.com/frame/`。留空时仍从域名根路径提供服务。若希望直接在 Go 命令中运行而不是 `go run`，先构建：
 
 ```sh
 go build -o bin/frame ./cmd/gateway
@@ -103,6 +103,7 @@ docker run --name frame \
 | 配置 | 用途 |
 | --- | --- |
 | `server.listen` | 网关监听地址和端口 |
+| `server.base_path` | 可选的服务子路径，例如 `/frame`；留空表示根路径 |
 | `server.access_token` | 用户登录访问令牌，至少 32 字节 |
 | `openlist.base_url`、`username`、`password` | OpenList 地址和登录凭据 |
 | `openlist.cipher_backend_path` | OpenList 内原始密文目录的绝对路径，不能指向已解密挂载 |

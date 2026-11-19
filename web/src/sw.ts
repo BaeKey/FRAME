@@ -8,6 +8,7 @@ interface SessionEntry {
   keyBase64: string; controllers: Set<AbortController>; revoked: boolean; refreshing: Promise<void> | null;
 }
 const worker = self as unknown as ServiceWorkerGlobalScope;
+const basePath = new URL('.', worker.location.href).pathname.replace(/\/$/, '');
 const sessions = new Map<string, SessionEntry>();
 const epochs = new Map<string, number>();
 const CHUNK_SIZE = 1024 * 1024;
@@ -49,7 +50,7 @@ async function credentials(clientId: string): Promise<SessionEntry> {
 
 async function api(session: SessionEntry, path: string, init: RequestInit = {}): Promise<Response> {
   if (session.revoked) throw new Error('会话已退出');
-  const response = await fetch(path, { ...init, cache: 'no-store', credentials: 'same-origin' });
+  const response = await fetch(`${basePath}${path}`, { ...init, cache: 'no-store', credentials: 'same-origin' });
   if (!response.ok) { const body = await response.json().catch(() => ({})) as { error?: string }; throw new Error(body.error || '存储不可用'); }
   return response;
 }
@@ -130,8 +131,9 @@ async function serveMedia(event: FetchEvent, id: string, download: boolean): Pro
 }
 worker.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url); if (url.origin !== worker.location.origin) return;
-  if (!/^\/(dec|download)\//.test(url.pathname)) return;
-  const match = MATCH.exec(url.pathname);
+  const path = url.pathname.startsWith(`${basePath}/`) ? url.pathname.slice(basePath.length) : url.pathname;
+  if (!/^\/(dec|download)\//.test(path)) return;
+  const match = MATCH.exec(path);
   if (!match || !['GET', 'HEAD'].includes(event.request.method)) { event.respondWith(new Response(null, { status: 404 })); return; }
   event.respondWith(serveMedia(event, match[2]!, match[1] === 'download'));
 });

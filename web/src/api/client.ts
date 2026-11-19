@@ -1,4 +1,5 @@
 import type { DeletePlan, DeleteResult, Group, IndexStatus, Item, NamingRule, PendingTask, SessionData, SourceInfo } from '../types';
+import { appPath } from '../lib/base-path';
 
 export interface ApiClient {
   login(token: string): Promise<void>; logout(): Promise<void>; getSession(): Promise<SessionData>;
@@ -14,7 +15,7 @@ export interface ApiClient {
 
 export function createApiClient(onUnauthorized: () => void): ApiClient {
   async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-    const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store', ...init });
+    const response = await fetch(appPath(path), { credentials: 'same-origin', cache: 'no-store', ...init });
     if (!response.ok) {
       const body = await response.json().catch(() => ({})) as { error?: string };
       if (response.status === 401) onUnauthorized();

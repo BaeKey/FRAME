@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Group, Item } from '../types';
 import { useCover } from '../hooks/useCover';
 import { dateParts, formatSize } from '../lib/format';
+import { appPath } from '../lib/base-path';
 
 export function MediaCard({ value, groupMode, managing, selected, onOpen, onSelect, onPreview }: {
   value: Group|Item; groupMode:boolean; managing?:boolean; selected?:boolean; onOpen:(value:Group|Item)=>void; onSelect?:(id:string)=>void; onPreview?:(value:Item)=>void;
@@ -17,7 +18,7 @@ export function MediaCard({ value, groupMode, managing, selected, onOpen, onSele
   const id=isGroup?group.name:item.id;
   return <article ref={ref} className={`media-card${selected?' selected':''}`}>
     <button className="card" onClick={()=>managing&&!isGroup?onSelect?.(id):onOpen(value)} aria-label={isGroup?`打开分组 ${group.name}，${group.count} 项内容`:`${item.type==='video'?'播放视频':item.type==='image'?'查看图片':'查看文件'} ${item.name}`}>
-      <div className={`card-visual${broken||!value.cover_file_id?' is-placeholder':''}`}><img src={broken?'/static/placeholder.svg':cover.src} alt="" loading="lazy" onError={()=>setBroken(true)}/>{!isGroup&&<span className="media-badge">{item.type==='video'?'▶ 视频':item.type==='image'?'▧ 图片':'文件'}</span>}</div>
+      <div className={`card-visual${broken||!value.cover_file_id?' is-placeholder':''}`}><img src={broken?appPath('/static/placeholder.svg'):cover.src} alt="" loading="lazy" onError={()=>setBroken(true)}/>{!isGroup&&<span className="media-badge">{item.type==='video'?'▶ 视频':item.type==='image'?'▧ 图片':'文件'}</span>}</div>
       <div className="card-body"><strong className="card-title" title={value.name}>{title}</strong><div className="card-meta"><span>{sub}</span><span>{detail}</span></div></div>
     </button>
     {!isGroup&&item.cover_file_id&&onPreview&&<button className="icon-button cover-preview" aria-label={`预览封面：${item.name}`} onClick={()=>onPreview(item)}>↗</button>}

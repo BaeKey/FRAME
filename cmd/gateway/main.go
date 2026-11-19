@@ -65,7 +65,7 @@ func run(ctx context.Context, configPath string) error {
 		return errors.New("命名规则配置无效，请检查 index.naming_rules")
 	}
 	defer index.Close()
-	handler := server.New(server.Options{Logger: logger, LogLevel: c.Logging.Level, AccessToken: c.Server.AccessToken, KeyTTL: time.Duration(c.Session.KeyTTLSeconds) * time.Second}, key, source, web.Assets, index, runtimeState)
+	handler := server.New(server.Options{Logger: logger, LogLevel: c.Logging.Level, AccessToken: c.Server.AccessToken, BasePath: c.Server.BasePath, KeyTTL: time.Duration(c.Session.KeyTTLSeconds) * time.Second}, key, source, web.Assets, index, runtimeState)
 	clear(key)
 	c.Crypt.Password = ""
 	c.Crypt.SaltBase64 = ""

@@ -50,7 +50,7 @@ func (s *server) cookie(w http.ResponseWriter, r *http.Request, raw string, expi
 	if raw == "" {
 		maxAge = -1
 	}
-	http.SetCookie(w, &http.Cookie{Name: cookieName, Value: raw, Path: "/", HttpOnly: true, Secure: !s.localHTTP(r), SameSite: http.SameSiteStrictMode, MaxAge: maxAge, Expires: expires})
+	http.SetCookie(w, &http.Cookie{Name: cookieName, Value: raw, Path: s.basePath + "/", HttpOnly: true, Secure: !s.localHTTP(r), SameSite: http.SameSiteStrictMode, MaxAge: maxAge, Expires: expires})
 }
 
 func (s *server) login(w http.ResponseWriter, r *http.Request) {

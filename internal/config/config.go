@@ -33,6 +33,7 @@ type Config struct {
 	} `yaml:"index"`
 	Server struct {
 		Listen      string `yaml:"listen"`
+		BasePath    string `yaml:"base_path"`
 		AccessToken string `yaml:"access_token"`
 	} `yaml:"server"`
 	OpenList struct {
@@ -116,6 +117,9 @@ func (c *Config) Validate() error {
 	}
 	if _, _, err := net.SplitHostPort(c.Server.Listen); err != nil {
 		return fmt.Errorf("server.listen 无效")
+	}
+	if c.Server.BasePath != "" && (c.Server.BasePath[0] != '/' || c.Server.BasePath == "/" || path.Clean(c.Server.BasePath) != c.Server.BasePath || strings.ContainsAny(c.Server.BasePath, "?#\\")) {
+		return fmt.Errorf("server.base_path 必须为空或规范的绝对子路径，例如 /frame")
 	}
 	u, err := url.Parse(c.OpenList.BaseURL)
 	if err != nil || u.Host == "" || (u.Scheme != "http" && u.Scheme != "https") || u.User != nil || u.RawQuery != "" || u.Fragment != "" {

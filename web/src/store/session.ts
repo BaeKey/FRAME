@@ -5,6 +5,7 @@ import { readCipherFile } from '../media-source';
 import { importKey } from '../crypto';
 import { createLogger, type LogLevel } from '../logger';
 import type { SessionData } from '../types';
+import { appPath } from '../lib/base-path';
 
 interface KeyState { key: CryptoKey; expires: number; logLevel: SessionData['log_level']; keyBase64: string }
 interface SessionState {
@@ -21,7 +22,7 @@ const api = createApiClient(() => { void clearSession(); });
 
 async function prepareWorker(): Promise<void> {
   if (!isSecureContext || !crypto.subtle || !('serviceWorker' in navigator)) throw new Error('请通过 HTTPS（或 localhost）访问，并使用支持 WebCrypto 和 Service Worker 的浏览器。');
-  registration = await navigator.serviceWorker.register('/sw.js', { type: 'module', scope: '/' });
+  registration = await navigator.serviceWorker.register(appPath('/sw.js'), { type: 'module', scope: appPath('/') });
   await navigator.serviceWorker.ready;
   if (navigator.serviceWorker.controller) return;
   await new Promise<void>((resolve, reject) => {

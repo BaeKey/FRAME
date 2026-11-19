@@ -4,6 +4,7 @@ import { decryptFile, imageType } from '../crypto';
 import { getImageBytes } from '../image-cache';
 import { useSessionStore } from '../store/session';
 import { formatSize } from '../lib/format';
+import { appPath } from '../lib/base-path';
 
 export function Viewer({item,onClose,onDelete}:{item:Item|null;onClose:()=>void;onDelete:(item:Item)=>void}) {
   const [src,setSrc]=useState('');const [error,setError]=useState('');const [scale,setScale]=useState(1);
@@ -17,7 +18,7 @@ export function Viewer({item,onClose,onDelete}:{item:Item|null;onClose:()=>void;
   if(!item)return null;
   return <div className="viewer-backdrop" role="presentation" onMouseDown={(e)=>{if(e.target===e.currentTarget)onClose();}}><section className="viewer" role="dialog" aria-modal="true" aria-labelledby="media-title">
     <header className="viewer-header"><div className="viewer-heading"><span className="small">{item.type==='video'?'视频预览':item.type==='image'?'图片预览':'其他格式文件'}</span><h2 id="media-title">{item.name}</h2></div><button className="icon-button" aria-label="关闭预览" onClick={onClose}>×</button></header>
-    <div className="media-stage">{item.type==='video'?<video src={`/dec/${item.id}`} autoPlay controls playsInline onError={()=>setError('无法播放。请检查加密配置、文件完整性，以及浏览器是否支持该视频编码。')}/>:src?<img src={src} alt={item.name} style={{width:scale===1?'auto':`${scale*100}%`}}/>:!error?<span className="spinner"/>:null}</div>
-    <p className="media-error" role="alert">{error}</p><footer className="viewer-toolbar">{item.type==='image'&&<div className="image-tools"><button className="icon-button" aria-label="缩小图片" onClick={()=>setScale(Math.max(.1,scale*.8))}>−</button><span>{scale===1?'适应窗口':`${Math.round(scale*100)}%`}</span><button className="icon-button" aria-label="放大图片" onClick={()=>setScale(Math.min(5,scale*1.25))}>＋</button><button className="text-button" onClick={()=>setScale(1)}>适应窗口</button></div>}<span className="small">{formatSize(Math.max(0,item.size-23))}</span><a className="text-button" href={item.type==='image'?(src||'#'):`/download/${item.id}`} download={item.name} onClick={(e)=>{if(item.type==='image'&&!src)e.preventDefault();}}>下载解密文件</a><button className="text-button danger-text" onClick={()=>onDelete(item)}>删除文件</button></footer>
+    <div className="media-stage">{item.type==='video'?<video src={appPath(`/dec/${item.id}`)} autoPlay controls playsInline onError={()=>setError('无法播放。请检查加密配置、文件完整性，以及浏览器是否支持该视频编码。')}/>:src?<img src={src} alt={item.name} style={{width:scale===1?'auto':`${scale*100}%`}}/>:!error?<span className="spinner"/>:null}</div>
+    <p className="media-error" role="alert">{error}</p><footer className="viewer-toolbar">{item.type==='image'&&<div className="image-tools"><button className="icon-button" aria-label="缩小图片" onClick={()=>setScale(Math.max(.1,scale*.8))}>−</button><span>{scale===1?'适应窗口':`${Math.round(scale*100)}%`}</span><button className="icon-button" aria-label="放大图片" onClick={()=>setScale(Math.min(5,scale*1.25))}>＋</button><button className="text-button" onClick={()=>setScale(1)}>适应窗口</button></div>}<span className="small">{formatSize(Math.max(0,item.size-23))}</span><a className="text-button" href={item.type==='image'?(src||'#'):appPath(`/download/${item.id}`)} download={item.name} onClick={(e)=>{if(item.type==='image'&&!src)e.preventDefault();}}>下载解密文件</a><button className="text-button danger-text" onClick={()=>onDelete(item)}>删除文件</button></footer>
   </section></div>;
 }
