@@ -35,6 +35,24 @@ func batchPlan(snapshot *Snapshot, ids []string) (DeletePlan, error) {
 			videoOwners[item.CoverID] = append(videoOwners[item.CoverID], item.ID)
 		}
 	}
+	// Deleting a paired image from its own preview removes the video content
+	// that uses it as a cover as well. Add those videos to the same confirmation
+	// plan so the frontend always shows the complete deletion set.
+	for _, item := range append([]Item(nil), p.Files...) {
+		if item.Type != "image" {
+			continue
+		}
+		for _, ownerID := range videoOwners[item.ID] {
+			if selected[ownerID] {
+				continue
+			}
+			owner, ok := snapshot.Files[ownerID]
+			if ok {
+				selected[ownerID] = true
+				p.Files = append(p.Files, owner)
+			}
+		}
+	}
 	for _, item := range append([]Item(nil), p.Files...) {
 		if item.Type != "video" || item.CoverID == "" || item.CoverID == item.ID {
 			continue

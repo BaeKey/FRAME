@@ -100,8 +100,6 @@ svg.icon { width: 20px; height: 20px; flex: 0 0 auto; display: block; }
 .card-meta > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .media-badge { position: absolute; bottom: 10px; left: 10px; display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; font-size: 12px; line-height: 1.4; border-radius: 5px; color: #fff; background: #18242de6; }
 .media-badge .icon { width: 14px; height: 14px; }
-.cover-preview { position: absolute; top: 10px; right: 10px; background: #fffffff2; color: #28343e; box-shadow: 0 2px 8px #00000012; border-radius: 8px; }
-.cover-preview:hover { background: white !important; }
 .cover-error { font-size: 12px; color: var(--danger); margin: 6px 2px 0; overflow-wrap: anywhere; }
 .video-select-label { position: absolute; left: 10px; top: 10px; min-height: 44px; min-width: 44px; display: flex; gap: 6px; align-items: center; padding: 8px; border-radius: 8px; background: var(--surface); box-shadow: 0 2px 8px #00000012; cursor: pointer; font-size: 13px; }
 .video-select { width: 20px; height: 20px; min-height: 20px; padding: 0; accent-color: var(--accent); margin: 0; cursor: pointer; }
@@ -197,6 +195,8 @@ progress::-moz-progress-bar { background: var(--accent); }
 .viewer :focus-visible { outline-color: #9ed4b9; }
 .media-stage { height: min(65dvh, 740px); min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: auto; background: #090d11; position: relative; }
 .media-stage img, .media-stage video { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.media-stage img { touch-action: manipulation; cursor: zoom-in; }
+.media-stage.is-zoomed img { cursor: zoom-out; }
 .media-stage.is-zoomed { display: block; }
 .media-stage.is-zoomed img { max-width: none; max-height: none; margin: auto; }
 .media-stage .spinner { border-color: #34434e; border-top-color: #b2d5c2; }
@@ -253,7 +253,6 @@ progress::-moz-progress-bar { background: var(--accent); }
   .card-title { font-size: 14px; }
   .card-body { padding-top: 10px; }
   .card-meta { flex-direction: column; gap: 1px; font-size: 12px; }
-  .cover-preview { top: 6px; right: 6px; }
   .media-badge { bottom: 6px; left: 6px; font-size: 11px; }
   .video-select-label { top: 6px; left: 6px; }
   .selection-bar { padding: 12px; }
