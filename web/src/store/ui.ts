@@ -1,14 +1,14 @@
 import { create } from 'zustand';
-import type { DeletePlan, Item } from '../types';
-export interface PageState { query: string; type: 'collection'|'all'|'video'|'image'; sort: 'asc'|'desc'; scroll: number }
+import type { DeletePlan, MediaEntry } from '../types';
+export interface PageState { query: string; sort: 'asc'|'desc'; scroll: number }
 interface UIState {
   managing: boolean; selectedIds: Set<string>; deleting: boolean; pendingDeletePlan: DeletePlan|null;
-  viewerItem: Item|null; namingDialogOpen: boolean; deleteDialogOpen: boolean; pageStates: Map<string,PageState>;
+  viewerItem: MediaEntry|null; namingDialogOpen: boolean; deleteDialogOpen: boolean; pageStates: Map<string,PageState>;
   toggleManaging(): void; toggleSelect(id:string):void; selectAll(ids:string[]):void; clearSelection():void; setNamingOpen(open:boolean):void;
-  openViewer(item:Item):void; closeViewer():void; savePageState(key:string,s:Partial<PageState>):void; getPageState(key:string):PageState;
+  openViewer(item:MediaEntry):void; closeViewer():void; savePageState(key:string,s:Partial<PageState>):void; getPageState(key:string):PageState;
   setDeletePlan(plan:DeletePlan|null):void; setDeleting(value:boolean):void; reset():void;
 }
-const initialPage: PageState = { query:'', type:'collection', sort:'desc', scroll:0 };
+const initialPage: PageState = { query:'', sort:'desc', scroll:0 };
 export const useUIStore = create<UIState>((set,get) => ({
   managing:false, selectedIds:new Set(), deleting:false, pendingDeletePlan:null, viewerItem:null, namingDialogOpen:false, deleteDialogOpen:false, pageStates:new Map(),
   toggleManaging() { set((s) => ({ managing:!s.managing, selectedIds:new Set() })); },
